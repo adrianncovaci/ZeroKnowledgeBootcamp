@@ -5,5 +5,14 @@ from starkware.cairo.common.cairo_builtins import BitwiseBuiltin, HashBuiltin
 func sum_even{bitwise_ptr: BitwiseBuiltin*}(arr_len: felt, arr: felt*, run: felt, idx: felt) -> (
     sum: felt
 ) {
-    return (0,);
+    if (arr_len == idx) {
+        return (run,);
+    }
+    let (is_odd) = bitwise_and(arr[idx], 1); 
+    if (is_odd == 0) {
+        let new_run = run + arr[idx];
+        return sum_even(arr_len, arr, new_run, idx + 1);
+    }
+
+    return sum_even(arr_len, arr, run, idx + 1);
 }

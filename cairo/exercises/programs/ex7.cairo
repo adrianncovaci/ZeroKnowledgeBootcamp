@@ -14,5 +14,35 @@ from starkware.cairo.common.math import unsigned_div_rem
 func pattern{bitwise_ptr: BitwiseBuiltin*, range_check_ptr}(
     n: felt, idx: felt, exp: felt, broken_chain: felt
 ) -> (true: felt) {
-    return (0,);
+    alloc_locals;
+    if (broken_chain == 1) {
+        return (0,);
+    }
+    if (idx == 8) {
+        let (is_odd) = bitwise_and(n, 1);
+        if (is_odd == 1) {
+            return (1,);
+        }
+        return (0,);
+    }
+    let (local is_odd) = bitwise_and(n, 1);
+    if (is_odd == 1 and exp == 0) {
+        let (right_shift, _) = unsigned_div_rem(n, 2);
+        let (right_odd) = bitwise_and(right_shift, 1);
+        return pattern(right_shift, idx + 1, right_odd, 0);
+    }
+
+    if (is_odd == 0 and exp == 1) {
+        let (right_shift, _) = unsigned_div_rem(n, 2);
+        let (right_odd) = bitwise_and(right_shift, 1);
+        return pattern(right_shift, idx + 1, right_odd, 0);
+    }
+
+    if (is_odd == 0 and exp == 0 and idx == 0) {
+        let (right_shift, _) = unsigned_div_rem(n, 2);
+        let (right_odd) = bitwise_and(right_shift, 1);
+        return pattern(right_shift, idx, right_odd, 0);
+    }
+
+    return pattern(n, idx, 0, 1);
 }
