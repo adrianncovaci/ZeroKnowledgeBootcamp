@@ -18,31 +18,26 @@ func pattern{bitwise_ptr: BitwiseBuiltin*, range_check_ptr}(
     if (broken_chain == 1) {
         return (0,);
     }
-    if (idx == 8) {
-        let (is_odd) = bitwise_and(n, 1);
-        if (is_odd == 1) {
-            return (1,);
-        }
-        return (0,);
-    }
-    let (local is_odd) = bitwise_and(n, 1);
-    if (is_odd == 1 and exp == 0) {
-        let (right_shift, _) = unsigned_div_rem(n, 2);
-        let (right_odd) = bitwise_and(right_shift, 1);
-        return pattern(right_shift, idx + 1, right_odd, 0);
+
+    if (n == 0) {
+        return (1,);
     }
 
-    if (is_odd == 0 and exp == 1) {
-        let (right_shift, _) = unsigned_div_rem(n, 2);
-        let (right_odd) = bitwise_and(right_shift, 1);
-        return pattern(right_shift, idx + 1, right_odd, 0);
+    let (is_odd) = bitwise_and(n, 1);
+    let (opposite) = bitwise_xor(is_odd, 1);
+    let (right_shift, _) = unsigned_div_rem(n, 2);
+
+    if (idx == 0 and is_odd == 0) {
+        return pattern(right_shift, idx, exp, broken_chain);
+    }
+    if (idx == 0 and is_odd == 1) {
+        return pattern(right_shift, idx + 1, exp, broken_chain);
     }
 
-    if (is_odd == 0 and exp == 0 and idx == 0) {
-        let (right_shift, _) = unsigned_div_rem(n, 2);
-        let (right_odd) = bitwise_and(right_shift, 1);
-        return pattern(right_shift, idx, right_odd, 0);
-    }
 
-    return pattern(n, idx, 0, 1);
+    if (is_odd == exp) {
+        return pattern(right_shift, idx + 1, opposite, 0);
+    } else {
+        return pattern(0, 0, 0, 1);
+    }
 }
